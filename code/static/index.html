@@ -5,13 +5,19 @@
   <meta charset="utf-8">
   <title>My Tiny AI Agent</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="/static/css/theme/color.css">
+  
   <link rel="stylesheet" href="/static/css/theme/theme-blue.css">
   <link rel="stylesheet" href="/static/css/theme/theme-dark.css">
   <link rel="stylesheet" href="/static/css/theme/theme-light.css">
-  <link rel="stylesheet" href="/static/css/lib/minireset.min.css">
+
+  <link rel="stylesheet" href="/static/css/lib/reset.css">
+  
   <link rel="stylesheet" href="/static/css/lib/github.min.css">
   <link rel="stylesheet" href="/static/css/lib/github-markdown.css">
+
   <link rel="stylesheet" href="/static/css/layout/bodyLayout.css">
+  
   <link rel="stylesheet" href="/static/css/ui/ui-icon.css">
   <link rel="stylesheet" href="/static/css/ui/ui-form.css">
   <link rel="stylesheet" href="/static/css/ui/ui-scrollbar.css">
@@ -22,79 +28,171 @@
   <link rel="stylesheet" href="/static/css/view/footerView.css">
   <link rel="stylesheet" href="/static/css/view/leftView.css">
   <link rel="stylesheet" href="/static/css/view/mainView.css">
+  
+  <link rel="stylesheet" href="/static/css/login/auth.css">
+  <link rel="stylesheet" href="/static/css/view/deleteView.css">
 </head>
 
 <body>
+  <div id="loginModal" class="login-modal-overlay">
+  <div class="login-card">
+    <h2 class="login-title">欢迎回来</h2>
+    
+    <input type="text" id="loginUser" class="login-input" placeholder="用户名 (例如: admin)">
+    
+    <input type="password" id="loginPwd" class="login-input" placeholder="密码">
+    
+    <button onclick="doLogin()" class="login-btn">登 录</button>
+    
+    <div id="loginMsg" class="login-msg"></div>
+    
+    <div class="login-footer">
+          还没有账号？ <a href="javascript:showRegister()" style="color:#2563eb; cursor:pointer;">去注册</a>
+      </div>
+  </div>
+</div>
+
+<div id="registerModal" class="login-modal-overlay" style="display:none;">
+    <div class="login-card" style="width: 360px;">
+      <h2 class="login-title">新用户注册</h2>
+      
+      <input type="text" id="regUser" class="login-input" placeholder="用户名 (登录账号)*">
+      
+      <input type="password" id="regPwd" class="login-input" placeholder="密码*">
+      
+      <input type="text" id="regNick" class="login-input" placeholder="昵称 (显示名)">
+      <input type="text" id="regReal" class="login-input" placeholder="真实姓名">
+      <input type="text" id="regMobile" class="login-input" placeholder="手机号码">
+      
+      <select id="regSex" class="login-select">
+          <option value="0">性别: 保密</option>
+          <option value="1">男</option>
+          <option value="2">女</option>
+      </select>
+      
+      <button onclick="doRegister()" class="login-btn">立即注册</button>
+      
+      <div id="regMsg" class="login-msg"></div>
+      
+      <div class="login-footer">
+          已有账号？ <a href="javascript:showLogin()" style="color:#2563eb; cursor:pointer;">去登录</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="renameModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">编辑对话名称</h3>
+          <span id="renameCloseBtn" class="modal-close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="renameInput" class="modal-input" placeholder="请输入新的对话名称">
+        </div>
+        <div class="modal-footer">
+          <button id="renameCancelBtn" class="btn-base btn-cancel">取消</button>
+          <button id="renameConfirmBtn" class="btn-base btn-primary">确定</button>
+        </div>
+    </div>
+  </div>
+
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+          <h3 class="modal-title">删除此会话?</h3>
+          </div>
+        <div class="modal-body">
+            <p class="modal-text">这条会话将被永久删除，不可恢复及撤销</p>
+        </div>
+        <div class="modal-footer">
+          <button id="deleteCancelBtn" class="btn-base btn-cancel">取消</button>
+          <button id="deleteConfirmBtn" class="btn-base btn-danger">删除</button>
+        </div>
+    </div>
+  </div>
 
   <header>
     <div class="logo">
-      <div class="textIcon">T</div>
-      <div class="title">我的小助理</div>
+      <div class="textIcon">L</div>
+      <div class="title">Lagent</div>
     </div>
     <div class="user">
-      <img class="avatar" src="/static/img/avatar.png">萨摩多罗
+      <img class="avatar" src="/static/img/avatar.png">未登录
     </div>
     </div>
   </header>
   <div class="layout">
     <aside class="left" id="left">
       <div class="closeBar">
-        <img class="icon24" src="/static/img/svg/sidebar.svg"></img>
+        <img class="icon24" src="/static/img/svg/sidebar.svg" 
+        onclick="toggleSidebar()" style="cursor: pointer;">      
       </div>
-      <button class="button">
+      <button class="button" id="newChatBtn">
         <img class="icon20" id="sidebarIcon" src="/static/img/svg/new.svg"></img>新建对话
       </button>
+      <div class="tag" id="historyTag" style="padding: 0 10px;">历史记录</div>
       <div class="logList">
-        <div class="tag">今天</div>
-        <div class="item truncate">苹果笔记本支持32B配置</div>
-        <div class="item truncate">Win11微信多开BAT脚本</div>
       </div>
     </aside>
     <main id="main">
-      <div class="title">
-        聊天客户端（流式）
+      <div id="collapsed-toolbar" class="collapsed-toolbar" style="display: none;">
+      <div class="toolbar-btn" onclick="toggleSidebar()" data-tooltip="展开侧边栏">
+        <img src="/static/img/svg/sidebar.svg" style="width: 20px; height: 20px;">
       </div>
-      <article id="chat" class="chat">
+      <div class="toolbar-btn" onclick="createNewChat()" data-tooltip="新建对话">
+        <img src="/static/img/svg/new.svg" style="width: 20px; height: 20px;">
+      </div>
+    </div>
+      
+      <iframe id="newChatFrame" src="/static/new-chat.html" frameborder="0" style="width: 100%; height: 100%; display: block;"></iframe>
 
-      </article>
+      <div id="conversation-view" style="display: none; flex-direction: column; height: 100%; width: 100%;">
+          
+          <div class="title">
+            聊天客户端（流式）
+          </div>
+          
+          <article id="chat" class="chat">
+          </article>
 
-      <div class="chatPanel">
-        <textarea id="prompt" placeholder="说点什么…"></textarea>
-        <div class="chatBar">
-
-          <div class="model-select">
-            <div class="select-container" id="select2">
-              <div class="select-header">
-                <span class="select-value">K1.5 响应迅速，视觉理解</span>
-                <span class="select-arrow"><i class="fas fa-chevron-down"></i></span>
+          <div class="chatPanel">
+            <textarea id="prompt" placeholder="说点什么…"></textarea>
+            
+            <div class="chatBar">
+              <div class="model-select">
+                <div class="select-container" id="select2">
+                  <div class="select-header">
+                    <span class="select-value">K1.5 响应迅速，视觉理解</span>
+                    <span class="select-arrow"><i class="fas fa-chevron-down"></i></span>
+                  </div>
+                  <div class="select-options">
+                    <div class="select-search">
+                      <input type="text" placeholder="搜索模型...">
+                    </div>
+                    <div class="select-option" data-value="k2">
+                      <i class="fas fa-crown"></i>
+                      <div>
+                        <div>K2 新模型 <span class="option-tag">推荐</span></div>
+                        <div class="option-description">旗舰模型，默认推荐</div>
+                      </div>
+                    </div>
+                    <div class="select-option" data-value="k1.5">
+                      <i class="fas fa-bolt"></i>
+                      <div>
+                        <div>K1.5</div>
+                        <div class="option-description">响应迅速，视觉理解</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="select-options">
-                <div class="select-search">
-                  <input type="text" placeholder="搜索模型...">
-                </div>
-                <div class="select-option" data-value="k2">
-                  <i class="fas fa-crown"></i>
-                  <div>
-                    <div>K2 新模型 <span class="option-tag">推荐</span></div>
-                    <div class="option-description">旗舰模型，默认推荐</div>
-                  </div>
-                </div>
-                <div class="select-option" data-value="k1.5">
-                  <i class="fas fa-bolt"></i>
-                  <div>
-                    <div>K1.5</div>
-                    <div class="option-description">响应迅速，视觉理解</div>
-                  </div>
-                </div>
+              <div>
+                <button id="sendBtn">发送</button>
+                <button id="stopBtn">停止</button>
+                <span id="loading" style="display:none;">思考中…</span>
               </div>
             </div>
-          </div>
-          <div>
-            <button id="sendBtn">发送</button>
-            <button id="stopBtn">停止</button>
-            <span id="loading" style="display:none;">思考中…</span>
-          </div>
-        </div>
+            </div>
       </div>
     </main>
     <aside class="right" id="right">
@@ -150,79 +248,10 @@
   <script src="/static/js/ui/select.js"></script>
   <script src="/static/js/llm/ChatRender.js"></script>
   <script src="/static/js/llm/ChatBox.js"></script>
-  <script src="/static/js/llm/llmClient.js"></script>
-
+  <script src="/static/js/llm/LLMClient.js"></script>
   <script src="/static/js/theme/Theme.js"></script>
 
-  <script>
-    const tabs = new Tabs('#myTabs', {
-      initialTab: 0,          // 初始显示的标签页索引
-      animation: true,  // 启用动画
-      showCloseButton: false, // 禁用标签页关闭按钮       
-      onChange: (index) => {  // 切换回调
-        console.log(`切换到标签页: ${index}`);
-      }
-    });
-
-    // 初始化示例
-    document.addEventListener('DOMContentLoaded', function () {
-      // 搜索下拉框
-      const select2 = new Select('#select2', {
-        search: true,
-        onChange: (value, text) => {
-          console.log('选择2:', value, text);
-        }
-      });
-
-    });
-  </script>
-  <script>
-    const apiBase = 'http://127.0.0.1:5800/fakeLLM/v1/chat/completions';
-    const model = 'mywen3:0.1b';
-    const bus = new EventBus();
-    client = new LLMClient({
-      apiBase: apiBase,
-      model: model, token: 'sk-test', botId: 'bot-007',bus
-    })
-    new ChatBox({
-      client,
-      idList: {
-        'chat': 'chat',
-        'input': 'prompt',
-        'tips': 'loading',
-        'sendBtn': 'sendBtn',
-        'stopBtn': 'stopBtn'
-      }
-    });
-
-    // 初始化 split.js 实例
-    document.addEventListener('DOMContentLoaded', function () {
-      const mySplit = new MySplit("#left", "#main", "#right");
-    });
-
-    //   // 添加点击事件监听器
-    //   const sidebarSvg = document.querySelector('.sidebar-svg');
-    //   const sidebarSvgCollapse = document.querySelector('.sidebar-svg-collapse');
-    //   const sidebarLeft = document.querySelector('.sidebar-left');
-
-    //   sidebarSvg.addEventListener('click', function () {
-    //     sidebarLeft.classList.toggle('collapsed');
-    //     if (sidebarLeft.classList.contains('collapsed')) {
-    //       sidebarSvgCollapse.style.display = 'inline-block';
-    //     } else {
-    //       sidebarSvgCollapse.style.display = 'none';
-    //     }
-    //   });
-
-    //   sidebarSvgCollapse.addEventListener('click', function () {
-    //     sidebarLeft.classList.toggle('collapsed');
-    //     if (sidebarLeft.classList.contains('collapsed')) {
-    //       sidebarSvgCollapse.style.display = 'inline-block';
-    //     } else {
-    //       sidebarSvgCollapse.style.display = 'none';
-    //     }
-    //   });
-    // });
+  <script src="/static/js/index/index.js"></script>
   </script>
 </body>
 

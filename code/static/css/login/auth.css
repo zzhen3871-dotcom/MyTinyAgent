@@ -1,0 +1,128 @@
+/* code/static/css/login.css */
+
+/* 1. 遮罩层 (Modal Overlay) */
+.login-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+    /* 默认先隐藏，还是显示？原代码是 display:flex，
+       如果需要默认隐藏，这里可以改为 display: none; 
+       然后通过 JS 控制 flex */
+}
+
+/* 2. 登录卡片 (Login Card) */
+.login-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+/* 3. 标题 */
+.login-title {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px; /* 补一个默认大小，h2 默认较大 */
+    font-weight: bold;
+}
+
+/* 4. 输入框通用样式 */
+.login-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    outline: none; /* 建议加上，防止聚焦时的默认蓝框丑陋，或者自定义 focus */
+    transition: border-color 0.2s;
+}
+
+.login-input:focus {
+    border-color: #2563eb; /* 聚焦变色，提升体验 */
+}
+
+/* 密码框单独加一点下边距，原代码是 20px */
+#loginPwd {
+    margin-bottom: 20px;
+}
+
+/* 5. 登录按钮 */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s; /* 优化过渡效果 */
+}
+
+.login-btn:hover {
+    background: #1d4ed8; /* 悬停加深颜色，内联样式做不到这个，CSS文件可以！*/
+}
+
+.login-btn:active {
+    transform: scale(0.98); /* 点击微缩效果 */
+}
+
+/* 6. 错误提示信息 */
+.login-msg {
+    color: red;
+    margin-top: 15px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+/* 7. 底部文字 */
+.login-footer {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* === 新增：注册页面的特有样式 === */
+/* 下拉选择框 (性别) */
+.login-select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.login-select:focus {
+    border-color: #2563eb;
+}
+
+/* 两个按钮并排 (登录/注册切换) */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #333;
+    flex: 1; /* 1:1 比例 */
+}
+.btn-secondary:hover {
+    background: #e2e8f0;
+}

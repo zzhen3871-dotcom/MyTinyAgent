@@ -1,0 +1,87 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>标签分片状态机（类封装版）</title>
+<body>
+  <h3>输入</h3>
+  <textarea id="in" rows="5" cols="60">
+普通文本1<think>思考内容</think>中间<chart>图表</chart>结尾
+  </textarea><br>
+  <button onclick="run()">分片</button>
+  <h3>分片结果（token 列表）</h3>
+  <pre id="out"></pre>
+
+<script>
+class TagMachine {
+  static ST = { TEXT: 0, OPEN: 1, TAG: 2 };
+
+  // 白名单直接写结束标签名字
+  static DEFAULT_ALLOW_TAGS = new Set(['think', '/think', 'chart', '/chart']);
+
+  constructor(allowTags = TagMachine.DEFAULT_ALLOW_TAGS) {
+    this.allowTags = new Set([...allowTags].map(t => t.toLowerCase()));
+  }
+
+  slice(str) {
+    const tokenList = [];
+    let state = TagMachine.ST.TEXT;
+    let buf = '';
+    let tagName = '';
+
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+
+      switch (state) {
+        case TagMachine.ST.TEXT:
+          if (ch === '<' && /[a-zA-Z\/]/.test(str[i + 1] || '')) { // 第二个字符可以是字母或 /
+            if (buf) tokenList.push({ type: 'text', content: buf }), buf = '';
+            state = TagMachine.ST.OPEN;
+          } else {
+            buf += ch;
+          }
+          break;
+
+        case TagMachine.ST.OPEN:
+          // 首字符可以是字母或 / （处理 </think>）
+          if (/[a-zA-Z0-9\/]/.test(ch)) {
+            tagName = ch.toLowerCase();
+            state = TagMachine.ST.TAG;
+          } else {
+            buf += '<' + ch;
+            state = TagMachine.ST.TEXT;
+          }
+          break;
+
+        case TagMachine.ST.TAG:
+          if (ch === '>') {
+            if (this.allowTags.has(tagName)) {
+              tokenList.push({ type: 'tag', name: tagName, full: `<${tagName}>` });
+            } else {
+              buf += `<${tagName}>`;
+            }
+            tagName = '';
+            state = TagMachine.ST.TEXT;
+          } else if (/[a-zA-Z0-9\/]/.test(ch)) { // 把 / 也视为合法字符
+            tagName += ch.toLowerCase();
+          } else {
+            buf += `<${tagName}${ch}`;
+            tagName = '';
+            state = TagMachine.ST.TEXT;
+          }
+          break;
+      }
+    }
+
+    if (state !== TagMachine.ST.TEXT) buf = `<${tagName}${buf}`;
+    if (buf) tokenList.push({ type: 'text', content: buf });
+
+    return tokenList;
+  }
+}
+// 全局运行函数
+function run() {
+  const slicer = new TagMachine(); // 可自定义白名单：new TagMachine(['think','chart','custom'])
+  const tokenList = slicer.slice(document.getElementById('in').value);
+  document.getElementById('out').textContent =
+    tokenList.map(t => JSON.stringify(t)).join('\n');
+}
+</script>

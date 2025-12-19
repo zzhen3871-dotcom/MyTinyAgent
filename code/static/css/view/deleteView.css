@@ -1,0 +1,117 @@
+/* code\static\css\view\modalView.css */
+
+/* 1. 遮罩层 */
+.modal-overlay {
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* 半透明黑背景 */
+    z-index: 2000; /* 保证在最上层 */
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* 2. 弹窗卡片主体 */
+.modal-card {
+    background: white;
+    border-radius: 12px;
+    width: 400px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.2s ease-out;
+}
+
+/* 3. 头部区域 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* 关闭的小叉号 */
+.modal-close {
+    cursor: pointer;
+    font-size: 24px;
+    color: #999;
+    line-height: 1;
+}
+.modal-close:hover { color: #666; }
+
+/* 4. 内容区域 */
+.modal-body {
+    margin-bottom: 24px;
+}
+
+.modal-text {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* 输入框 (重命名用) */
+.modal-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-sizing: border-box; 
+    font-size: 14px;
+    outline: none;
+}
+.modal-input:focus { border-color: #2563eb; }
+
+/* 5. 底部按钮区 */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* 按钮基础样式 */
+.btn-base {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+/* 取消按钮 */
+.btn-cancel {
+    background: #fff;
+    border-color: #e5e7eb;
+    color: #374151;
+}
+.btn-cancel:hover { background: #f9fafb; }
+
+/* 确认按钮 (蓝色) */
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+.btn-primary:hover { background: #1d4ed8; }
+
+/* 危险按钮 (红色 - 删除用) */
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+.btn-danger:hover { background: #dc2626; }
+
+/* 动画定义 */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

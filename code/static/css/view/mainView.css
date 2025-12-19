@@ -15,6 +15,11 @@ main #stopBtn {
   color: #fff
 }
 
+main #sendBtn {
+  background-color: #4b8bf5;
+  color: white;
+}
+
 main #loading {
   font-size: 14px;
   color: #656d76

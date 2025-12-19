@@ -20,9 +20,7 @@ class ChartRenderer {
     const regex = /chart_start([\s\S]*?)chart_end/g; // 全局，支持多图表
     let match;
     while ((match = regex.exec(contentDiv.innerHTML)) !== null) {
-      const raw = match[1]
-        .replace(/[‘’']/g, '"')   // 统一引号
-        .replace(/(\w+):/g, '"$1":'); // 粗略补双引号（简单场景够用）
+      const raw = match[1];
       try {
         const cfg = JSON.parse(raw);
         this._drawChart(cfg, contentDiv, match[0]); // 把整块替换掉

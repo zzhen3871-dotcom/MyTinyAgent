@@ -1,3 +1,4 @@
+# 时间间隔记录工具，用于调试和监控
 import time
 from typing import Optional
 from tool.LogTool import LogTool

@@ -19,7 +19,7 @@ header {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  background-color: var(--header-bg);
+  background-color: var(--bg-header);
   border-bottom: 1px solid var(--border);
   justify-content: space-between;
   align-items: center;
@@ -35,12 +35,14 @@ header {
     height: 100%;
     overflow: hidden;
 }
+
 main {
     display: flex;
     flex-direction: column;
     gap: 10px;
     flex: 1;
-    background-color: var(--main-bg);
+    background-color: var(--bg-main);
+    position: relative;  /* 这样悬浮条就会相对于 main 区域定位，而不是整个 body */
 }
 
 .left {
@@ -48,15 +50,16 @@ main {
     flex-direction: column;
     width: 220px;
     min-width: 160px;
-    background-color: var(--left-bg);
+    background-color: var(--bg-left);
 }
 
 .right {
     min-width: 160px;
     width: 240px;
-    background-color: var(--right-bg);
+    background-color: var(--bg-right);
     overflow: auto;
 }
+
 footer {
   display: flex;
   flex-direction: row;
@@ -65,8 +68,31 @@ footer {
   height: 30px;
   line-height: 30px;
   border-top: 1px solid var(--border);
-  background-color: var(--footer-bg);
+  background-color: var(--bg-footer);
   padding: 0 10px;
   overflow: hidden;
 }
 
+
+/* 1. 当 body 有 layout-collapsed 类时 -> 隐藏左侧栏 */
+body.layout-collapsed .left {
+    display: none !important;
+}
+
+/* 2. 隐藏可能存在的 Split.js 拖拽条 
+   (通常 split.js 会生成一个 class 叫 .gutter 的 div) */
+body.layout-collapsed .gutter:nth-of-type(1) {
+    display: none !important;
+}
+
+/* 3. 显示悬浮工具栏 (默认是 hidden 的) */
+body.layout-collapsed #collapsed-toolbar {
+    display: flex !important;
+}
+
+/* 4. 【核心修改】不要强制 Main 100% 宽，否则会把右边栏挤出屏幕 */
+/* 设为 auto 并强制 flex:1，让它自动填充左边空出来的空间，但给右边留位置 */
+body.layout-collapsed #main {
+    width: auto !important; 
+    flex: 1 !important;
+}

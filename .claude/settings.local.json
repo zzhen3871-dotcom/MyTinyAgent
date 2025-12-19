@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "Bash(mysql:*)"
+    ]
+  }
+}

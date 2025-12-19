@@ -5,6 +5,7 @@
     height: 40px;
     justify-content: flex-end;
     align-items: center;
+    opacity: 0.8;  
 }
 .left .svg {
     cursor: pointer;
@@ -30,25 +31,33 @@
     margin: 0 10px;
     padding: 0 10px;
     line-height: 30px;
-}
-
-.left .button:hover {
     border: 1px solid #e5e7eb;
 }
 
-.left .logList {
-   margin: 0 10px;
 
+.left .logList {
+   padding: 0 10px;
+   margin-bottom: 10px;
+/* [新增] 让列表占据侧边栏剩余的所有空间 */
+    flex: 1;
+    /* [新增] 关键！内容超高时，显示垂直滚动条 */
+    overflow-y: auto;
+    /* [新增] 优化滚动体验，防止横向滚动条出现 */
+    overflow-x: hidden;
 }
 
 .left .tag {
     font-size: 14px;
     color: #666;
     font-weight: bold;
-    margin: 10px 0;
+    margin: 10px 0 5px 10px; /* 调整一下边距，跟列表对齐 */
 }
 
 .left .item {
+    display: flex;              /* [新增] 弹性布局 */
+    justify-content: space-between; /* [新增] 两端对齐：文字在左，图标在右 */
+    align-items: center;        /* [新增] 垂直居中 */
+
     text-align: left;
     border-radius: 4px;
     font-size: 14px;
@@ -57,6 +66,50 @@
     cursor: pointer;
     line-height: 30px;
     padding: 0 10px;
+    position: relative; /* 关键：给里面的绝对定位做基准 */
+}
+
+.left .item:hover {
+    background-color: #f0f0f0;
+    ;
+}
+
+.left .item.active {
+    background-color: #e6e6e6; /* 比 hover 的 #f0f0f0 更深一点 */
+    color: #000;               /* 文字颜色加深 */
+    font-weight: bold;         /* 可选：加粗 */
+    border-left: 3px solid #2563eb; /* 可选：左侧加个蓝条，更有选中感 */
+}
+.left .item.active:hover {
+    background-color: #e6e6e6;
+}
+
+
+/* 2. 内部文字样式：负责省略号截断 */
+.left .item .item-text {
+    flex: 1;                /* 占满剩余空间 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 8px;      /* 给右边图标留点距离 */
+}
+
+/* 3. 图标样式：默认隐藏 */
+.left .item .item-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0;             /* 默认透明（看不见） */
+    transition: opacity 0.2s; /* 渐变动画 */
+    flex-shrink: 0;         /* 防止被挤扁 */
+}
+
+.left .item:hover .item-icon {
+    opacity: 0.6;           /* 显示出来，稍微淡一点 */
+}
+.left .item:hover .item-icon:hover {
+    /* opacity: 1;             鼠标摸到图标时，完全不透明 */
+    background-color: rgba(0,0,0,0.1); /* 可选：给图标加个小背景圆圈 */
+    border-radius: 4px;
 }
 
 .left .truncate {
@@ -65,7 +118,114 @@
     white-space: nowrap;
 }
 
-.left .item:hover {
-    background-color: #f0f0f0;
-    ;
+.left .item .item-pin {
+    width: 14px;
+    height: 14px;
+    margin-right: 4px; /* 和右边的设置图标拉开点距离 */
+    flex-shrink: 0;
+    background-color: #f3f4f6;
+}
+
+/* --- 新增：右键/点击菜单容器 --- */
+/* 我们会用 JS 动态生成这个菜单，把它放在 body 下或者 item 里 */
+.pop-menu {
+    position: absolute;
+    z-index: 1000;
+    width: 100px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+    display: none; /* 默认隐藏 */
+}
+
+.pop-menu-item {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.pop-menu-item .menu-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px; /* 图标和文字的间距 */
+    opacity: 0.7;      /* 稍微淡一点，好看 */
+}
+
+.pop-menu-item:hover {
+    background-color: #f3f4f6;
+}
+
+.pop-menu-item.danger {
+    color: #ef4444; /* 删除按钮用红色 */
+}
+
+.pop-menu-item.danger .menu-icon {
+    filter: invert(33%) sepia(95%) saturate(7483%) hue-rotate(352deg) brightness(98%) contrast(92%);
+    /* 上面这行是让图标变红的 CSS 滤镜，或者你直接用红色的 svg */
+}
+
+/* 1. 容器：胶囊形状，固定在左上角 */
+.collapsed-toolbar {
+    position: absolute;
+    top: 10px;       /* 距离顶部 */
+    left: 10px;      /* 距离左边 */
+    z-index: 100;    /* 保证层级最高，浮在聊天框上面 */
+    
+    display: flex;
+    align-items: center;
+    gap: 4px;        /* 两个图标之间的间距 */
+    
+    background-color: #fff;  /* 背景色，跟你的 .button 保持一致 */
+    border: 1px solid #e5e7eb; /* 边框颜色 */
+    border-radius: 8px;      /* 圆角 */
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 加一点阴影，更有立体感 */
+}
+
+/* 2. 按钮项：鼠标放上去变色 */
+.toolbar-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    
+    display: flex;   /* 让图标居中 */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    
+    position: relative; /* 为了定位 Tooltip */
+}
+
+.toolbar-btn:hover {
+    background-color: #f3f4f6; /* 悬停时的灰色背景 */
+}
+
+/* 3. Tooltip 提示框 (黑色小气泡) */
+.toolbar-btn::after {
+    content: attr(data-tooltip); /* 自动读取 html 里的文字 */
+    position: absolute;
+    top: 110%;       /* 在按钮下方 */
+    left: 50%;
+    transform: translateX(-50%); /* 居中 */
+    
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;      /* 默认看不见 */
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 101;
+}
+
+.toolbar-btn:hover::after {
+    opacity: 1;      /* 鼠标悬停时显示 */
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建对话</title>
+    <link rel="stylesheet" href="/static/css/lib/reset.css">
+    <link rel="stylesheet" href="/static/css/theme/theme-light.css"> <link rel="stylesheet" href="/static/css/view/newChatView.css">
+</head>
+<body>
+    <div class="new-chat-container">
+        <section class="welcome-section">
+            <h1>今天有什么可以帮你的？</h1>
+        </section>
+
+        <div class="chat-input-panel">
+            <textarea id="prompt" placeholder="给 TinyAgent 发消息..."></textarea>
+            
+            <div class="panel-footer">
+                <div class="icon-group-left">
+                    <div class="icon-wrapper"><img src="/static/img/svg/link.svg"><span class="tooltip">上传</span></div>
+                    <div class="icon-wrapper"><img src="/static/img/svg/internet.svg"><span class="tooltip">搜索</span></div>
+                    <div class="icon-wrapper"><img src="/static/img/svg/prompt.svg"><span class="tooltip">提示词</span></div>
+                </div>
+                <button class="send-button" id="sendBtn">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const textarea = document.getElementById('prompt');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // 自动高度
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if (!this.value) this.style.height = '44px';
+        });
+
+        // 发送逻辑：通知父页面 (Index.html)
+        function notifyParentToSend() {
+            const content = textarea.value.trim();
+            if (!content) return;
+
+            // 关键：向父窗口发送消息
+            window.parent.postMessage({
+                type: 'new-chat-message', // 消息类型标记
+                content: content
+            }, '*');
+
+            // 清空自己
+            textarea.value = '';
+            textarea.style.height = '44px';
+        }
+
+        sendBtn.addEventListener('click', notifyParentToSend);
+        
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                notifyParentToSend();
+            }
+        });
+        // 【新增】监听整个页面的点击，通知父页面 (index.html)
+        document.addEventListener('click', () => {
+            // 向父窗口发送一个 "global-click" 信号
+            window.parent.postMessage({ type: 'global-click' }, '*');
+        });
+    </script>
+</body>
+</html>

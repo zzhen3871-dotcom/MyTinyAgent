@@ -1,0 +1,162 @@
+/* 1. 定义局部变量，防止父级变量缺失导致一片白 */
+:root {
+    --nc-bg-color: #ffffff;
+    --nc-input-bg: #f4f4f4; /* 浅灰背景，确保输入框可见 */
+    --nc-border: #e5e5e5;
+    --nc-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --nc-primary: #4b8bf5;
+    --nc-primary-hover: #3a75d9;
+    --nc-text: #333333;
+}
+
+/* 2. 容器样式：不再依赖 body，而是用专门的容器包裹 */
+.new-chat-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    min-height: 80vh; /* 保证有足够高度居中 */
+    background-color: var(--chat-bg, var(--nc-bg-color)); /* 优先用主题色，否则用默认白 */
+    font-family: "Microsoft YaHei", "PingFang SC", "Heiti SC", sans-serif;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 3. 欢迎语区域 */
+.welcome-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.welcome-section h1 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text-color-dark, var(--nc-text));
+    margin-bottom: 10px;
+}
+
+/* 4. 输入框外层容器 (仿 ChatGPT 样式) */
+.chat-input-panel {
+    width: 90%;
+    max-width: 720px; /* 限制最大宽度 */
+    background-color: var(--nc-bg-color);
+    border: 1px solid var(--nc-border);
+    border-radius: 16px;
+    box-shadow: var(--nc-shadow);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s;
+    position: relative;
+}
+
+.chat-input-panel:focus-within {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    border-color: #d1d1d1;
+}
+
+/* 5. 文本域 */
+.chat-input-panel textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-color, var(--nc-text));
+    background: transparent;
+    padding: 0;
+    margin-bottom: 8px;
+    min-height: 44px; /* 给一个默认高度 */
+    font-family: inherit;
+}
+
+.chat-input-panel textarea::placeholder {
+    color: #aaa;
+}
+
+/* 6. 底部工具栏 */
+.panel-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+}
+
+/* 左侧图标组 */
+.icon-group-left {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-wrapper {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.icon-wrapper:hover {
+    background-color: #f0f0f0;
+}
+
+.icon-wrapper img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+}
+
+.icon-wrapper:hover img {
+    opacity: 1;
+}
+
+/* 发送按钮 */
+.send-button {
+    background-color: var(--primary-color, var(--nc-primary));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.send-button:hover {
+    background-color: var(--primary-hover-color, var(--nc-primary-hover));
+}
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.icon-wrapper:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

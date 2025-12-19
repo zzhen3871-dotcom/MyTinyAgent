@@ -2,7 +2,7 @@ import time
 import json
 import asyncio
 class LLMTool:
-    @staticmethod
+    @staticmethod  # 调用静态方法，不需要创建类的实例
     def getChunk(text, id="fake-id",model="fake-model", stop=None):
         chunk = {
             "id": id,

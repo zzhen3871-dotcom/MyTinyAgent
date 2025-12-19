@@ -1,16 +1,13 @@
 [data-theme="blue"] {
   --bg: #001543;
   --text: #FFF;
-  --header-bg: #001543;  /*头部背景颜色*/
-  --main-bg:#001543;
-  --left-bg: #001543;    /*左边面板背景颜色*/
-  --right-bg: #001543;   /*右边面板背景颜色*/
-  --footer-bg: #001543;
-
-  --gutter-bg:#0291CA;
-  --gutter-bg-hover:#2B3C63;
-
-
+  --bg-header: #001543;  /*头部背景颜色*/
+  --bg-main:#001543;
+  --bg-left: #001543;    /*左边面板背景颜色*/
+  --bg-right: #001543;   /*右边面板背景颜色*/
+  --bg-footer: #001543;
+  --bg-gutter:#0291CA;
+  --bg-gutter-hover:#2B3C63;
   --ui-bg: 000C2C;      /*UI 控件背景颜色*/
   --ui-text: #FFF;    /*UI 控件文本颜色*/
   --ui-hover: #2B3C63;   /*UI 控件鼠标经过颜色*/
@@ -24,10 +21,7 @@
 }
 
 
-[data-theme="blue"] {
-    width: 100%;
-    /* dark */
-    color-scheme: dark;
+[data-theme="blue"] .markdown-body{
     --focus-outlineColor: #1f6feb;
     --fgColor-default: #f0f6fc;
     --fgColor-muted: #9198a1;

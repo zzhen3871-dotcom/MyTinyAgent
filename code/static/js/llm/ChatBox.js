@@ -102,38 +102,77 @@ eventBus.emit('chat-reset');
     console.log('[ChatBox] 已开启新会话');
   }
 
-
-  addChat(e) {
-    console.log('新建聊天块', e);
+  /**
+   * 【核心方法】渲染单条消息
+   * @param {string} role - 'user' 或 'assistant'
+   * @param {string} content - 消息内容
+   * @returns {HTMLElement} 渲染后的 section 元素
+   */
+  
+  // 1. 【修改】把渲染单条消息的逻辑提取出来，变成一个通用方法
+  renderMessage(role, content) {
+    const isUser = role === 'user';
     const section = document.createElement('section');
-    if (e.detail.role === 'user') {
-      section.innerHTML = `
-        <div class="msg-header">
-          <img class="icon20" src="/static/img/avatar/user.svg">
-          <div>用户</div>
-        </div>
-        <div class="msg-content markdown-body">
-          ${e.detail.content}
-        </div>`;
-    } else {
-      section.innerHTML = `
-        <div class="msg-header">
-          <img class="icon20" src="/static/img/avatar/assistant.svg">
-          <div>Qwen32b</div>
-        </div>
-        <div class="msg-content markdown-body">
-          ${e.detail.content}
-        </div>`;
+    
+    // 统一设置间距
+    section.style.marginBottom = '24px'; 
+
+    // 图片路径
+    const avatarSrc = isUser ? '/static/img/avatar/user.svg' : '/static/img/avatar/assistant.svg';
+    const name = isUser ? '用户' : 'Qwen32b'; 
+
+    // Markdown 解析
+    let contentHtml = content;
+    if (!isUser && typeof marked !== 'undefined') {
+        contentHtml = marked.parse(content);
     }
+    // === 核心：这里定义了结构，以后改这就全改了 ===
+    section.innerHTML = `
+      <div class="msg-header" style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <img class="icon20" src="${avatarSrc}" style="width:24px; height:24px; border-radius:50%;">
+        <div style="font-weight:bold; font-size:14px; color:#444;">${name}</div>
+      </div>
+      <div class="msg-content markdown-body" style="padding-left:34px;">
+        ${contentHtml}
+      </div>`;
+    
+    // 代码高亮
+    if (!isUser && typeof hljs !== 'undefined') {
+        section.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    }
+
+    return section;
+  }
+  
+//修改
+  addChat(e) {
+    console.log('[ChatBox] 新建聊天块', e.detail);
+    const section = this.renderMessage(e.detail.role, e.detail.content);
     this.chat.appendChild(section);
     this.chat.scrollTop = this.chat.scrollHeight;
   }
 
   updateChat(e) {
-    const contentDiv = this.chat.querySelector(
-      'section:last-of-type .msg-content'
-    );
-    if (contentDiv) contentDiv.innerHTML = marked.parse(e.detail.content);
+    // 找到最后一个 section 的内容区域
+    const lastSection = this.chat.lastElementChild;
+    if (!lastSection) return;
+
+    const contentDiv = lastSection.querySelector('.msg-content');
+    
+    if (contentDiv) {
+        // AI 回复时实时渲染 Markdown
+        contentDiv.innerHTML = marked.parse(e.detail.content);
+        
+        // 代码高亮 (如果有 hljs)
+        if (typeof hljs !== 'undefined') {
+            contentDiv.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+    }
+
     this.chartRenderer.render();
     this.chat.scrollTop = this.chat.scrollHeight;
   }
